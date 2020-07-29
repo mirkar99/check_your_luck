@@ -1,0 +1,163 @@
+const form = document.querySelectorAll('.form');
+
+const userInputs= document.querySelectorAll('.form__input--user'); //all 'user' input in nodelist
+const siteInputs = document.querySelectorAll('.form__input--site'); //all 'site' input in nodelist
+
+const siteInputsArray=[]; //Array with 'site' input values
+const userInputsArray=[]; //Array with 'user' input values
+
+const checkButton = document.querySelector('.form__button--check'); //'check' button
+const cleanButton = document.querySelector('.form__button--clean'); //'clean' button
+const randomButton= document.querySelector('.form__button--random'); //'random' button
+const formText=document.querySelector('.form__text');
+
+form[1].addEventListener('change',function(child){
+    child.target.classList.remove('wrong');
+    child.target.classList.remove('good');
+},false);
+form[1].addEventListener('keydown',function(child){
+    child.target.classList.remove('wrong');
+    child.target.classList.remove('good');
+},false);
+
+const removeClassesGoodWrong = () =>{
+    for(el of userInputs){
+    el.classList.remove('good');
+    el.classList.remove('wrong');
+    }
+}//function removing classes good and wrong
+const checkUserInputs = () => {
+    for(let i=0;i<userInputs.length;i++){
+        userInputsArray[i]=userInputs[i].value;
+    }
+    const checkValues =new Set(userInputsArray).size !== userInputsArray.length;
+    let checkRange;
+    for(el of userInputs){
+        if(el.value > 48 || el.value <= 0){
+            checkRange=true;
+        }
+    }
+    if(userInputsArray.indexOf("") !== -1){
+        return 'empty';
+    }
+    else{
+    if(checkRange==true){
+        return 'outofrange';
+    }else{
+        if(checkValues==true){
+            return true;
+        }
+        else{
+            userInputsArray.sort((a,b)=>a-b);
+            for(let i=0;i<userInputs.length;i++){
+                userInputs[i].value=userInputsArray[i];
+            }
+            return false;
+        }
+    }
+}
+} //function checking 'user' inputs values
+const giveSiteInputValues = () => {
+    let loopValue=false;
+        do{
+            for(let i=0;i<siteInputs.length;i++){
+            siteInputsArray[i]=Math.floor(Math.random() * (48 - 1 + 1)) + 1;
+        }
+    const checkValues =new Set(siteInputsArray).size !== siteInputsArray.length;
+        if(checkValues==false){
+            siteInputsArray.sort((a,b)=>a-b);
+            for(let i=0;i<siteInputs.length;i++){
+                siteInputs[i].value=siteInputsArray[i];
+            }
+            loopValue=true;
+        }
+}while(loopValue!=true);
+} //function giving to 'site' inputs  random in rage of 1 to 48 values
+const checkValues = () => {
+    let goodNumber=0;
+    for(el of userInputs){
+        removeClassesGoodWrong();
+    }
+    for(let i=0 ; i< userInputs.length ; i++){
+       for(let x=0;x<siteInputs.length;x++){
+           if(userInputs[i].value==siteInputs[x].value){
+                userInputs[i].classList.add('good');
+                 userInputs[i].classList.remove('wrong');
+                goodNumber ++;
+           }
+           else if(userInputs[i].classList.contains('good')){
+                userInputs[i].classList.remove('wrong');
+           }
+           else{
+                userInputs[i].classList.add('wrong');
+           }
+
+        } 
+    if(goodNumber==0){
+        formText.innerText='You  guess nothing';
+    }else if(goodNumber==1){
+        formText.innerText=`You guess ${goodNumber} number`;
+    }else{
+        formText.innerText=`You guess ${goodNumber} numbers`;
+    }
+    }
+} //funtion comparison 'user' and 'site' inputs values
+const showHiddenInput = () => {
+    for(el of siteInputs){
+        if(el.classList.contains('hidden')){
+        el.classList.remove('hidden');
+        }
+    }
+} //function showing 'site' inputs if they are hidden
+const afterCheckButtonClick= () => {
+    if(checkUserInputs()=='empty'){
+        formText.innerText='Empty Inputs. You must to fullfill empty place';
+    }else if(checkUserInputs()==true){
+        formText.innerText='Duplicates. One number can be only in one place';
+    }else if(checkUserInputs()=='outofrange'){
+        formText.innerText='Out Of Range. Number must be in rage of 1 to 48';
+    }else{
+        showHiddenInput(),    
+        giveSiteInputValues(),
+        checkValues()
+    }
+}//function 
+
+const cleanInputs = () => {
+    for(el of siteInputs){
+        el.value='';
+        el.classList.add('hidden');
+    }
+    for(el of userInputs){
+        el.value='';
+        el='';
+        removeClassesGoodWrong();
+        }
+    formText.innerText='';
+} //function cleaning all inputs
+const randomValue = () => {
+    let loopValue = false;
+    do{
+    for(let i=0;i<userInputs.length;i++){
+        userInputs[i].value=Math.floor(Math.random() * (48 - 1 + 1)) + 1;
+        userInputsArray[i]=userInputs[i].value;
+        removeClassesGoodWrong();
+    }
+
+    const checkValues =new Set(userInputsArray).size !== userInputsArray.length;
+
+    if(checkValues==false){
+        loopValue=true;
+        for(let i=0;i<siteInputs.length;i++){
+            siteInputs[i].classList.add('hidden');
+        }
+        formText.innerText='';
+    }
+
+}while(loopValue!=true);
+} //function giving to 'user' inputs  random in rage of 1 to 48 values
+
+checkButton.addEventListener('click',afterCheckButtonClick,false); //event on click
+cleanButton.addEventListener('click',cleanInputs,false); //event on click
+randomButton.addEventListener('click',randomValue,false); //event on click
+
