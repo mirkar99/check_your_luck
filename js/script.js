@@ -92,6 +92,7 @@ const cleanInputs=function(){
     for(el of siteInputs){
         el.value='';
     }
+    formText.style.color='white';
 }
 const removeText = function(){
     formText.innerHTML='';
